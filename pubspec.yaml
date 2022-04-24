@@ -1,0 +1,56 @@
+name: historical_guides_admin
+description: A new Flutter project.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.16.1 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+
+  cupertino_icons: ^1.0.2
+  file_picker: ^4.5.0
+  freezed_annotation: ^1.1.0
+  json_annotation: ^4.4.0
+  gpx: ^2.1.0
+  provider: ^6.0.0
+  graphql: ^5.0.1
+  # dio: ^4.0.4
+  http_parser: ^4.0.0
+  geojson_vi: ^2.0.7
+  parse_server_sdk: ^3.1.0
+  latlong2: ^0.8.1
+  # mapbox_gl:
+  #   path: ../../flutter-mapbox-gl
+  uuid: ^3.0.6
+  flutter_dotenv: ^5.0.2
+  historical_guides_commons:
+    path: ../historical_guides_commons
+  mapbox_gl:
+    path: ../../flutter-mapbox-gl
+
+dependency_overrides:
+  mapbox_gl_platform_interface:
+    path: ../../flutter-mapbox-gl/mapbox_gl_platform_interface
+  mapbox_gl_web:
+    path: ../../flutter-mapbox-gl/mapbox_gl_web
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^1.0.0
+  build_runner: ^2.0.0
+  freezed: ^1.1.1
+  json_serializable: ^6.0.0
+
+
+flutter:
+  uses-material-design: true
+
+  assets:
+      - .env
