@@ -26,10 +26,12 @@ class EditPoIView extends StatelessWidget {
           appBar: AppBar(
             title: const Text('Edit PoI'),
           ),
-          floatingActionButton: FloatingActionButton(
-            child: const Icon(Icons.add),
-            onPressed: model.editComplete ? model.savePoint : null,
-          ),
+          floatingActionButton: model.editComplete
+              ? FloatingActionButton(
+                  child: const Icon(Icons.add),
+                  onPressed: model.savePoint,
+                )
+              : null,
           body: Consumer<MapFeaturePoint?>(
             builder: (context, value, child) {
               final pointOnMap = value != null;

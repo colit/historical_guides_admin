@@ -8,11 +8,12 @@ import 'package:historical_guides_admin/core/models/track_point.dart';
 import 'package:http_parser/http_parser.dart';
 
 import 'package:latlong2/latlong.dart';
+import 'package:parse_server_sdk/parse_server_sdk.dart';
 
 import '../exeptions/general_exeption.dart';
 import '../services/interfaces/i_cloud_data_repository.dart';
 
-class GraphQLRepository implements ICloudDataRepository {
+class ParseServerRepository implements ICloudDataRepository {
   final _httpLink = HttpLink(
     GraphQLSetup.graphqlAPI,
     defaultHeaders: GraphQLSetup.graphQLHeader,
@@ -192,8 +193,9 @@ class GraphQLRepository implements ICloudDataRepository {
           result.exception?.graphqlErrors.first.message ?? 'Server Error';
       throw GeneralExeption(title: 'graphQL Exception', message: message);
     } else {
-      return List<Tour>.from(result.data?['tracks']['edges']
+      final tours = List<Tour>.from(result.data?['tracks']['edges']
           .map((node) => Tour.fromGraphQL(node['node'])));
+      return tours;
     }
   }
 
@@ -214,7 +216,10 @@ class GraphQLRepository implements ICloudDataRepository {
   Future<Tour> getTourDetails(String tourId) async {
     final options = QueryOptions(
       document: gql(GraphQLQueries.getTourDetails),
-      variables: {'id': tourId},
+      variables: {
+        'id': tourId,
+      },
+      fetchPolicy: FetchPolicy.cacheAndNetwork,
     );
     final result = await client.query(options);
     if (result.hasException) {
@@ -222,9 +227,75 @@ class GraphQLRepository implements ICloudDataRepository {
           result.exception?.graphqlErrors.first.message ?? 'Server Error';
       throw GeneralExeption(title: 'graphQL Exception', message: message);
     } else {
-      final node = List.from(result.data?['tracks']['edges']).first['node'];
-      return Tour.fromGraphQL(node);
+      final tour = Tour.fromGraphQL(
+          List.from(result.data?['tracks']['edges']).first['node']);
+      print('loaded tour with ${tour.pointsOfInterest.length} points');
+      return tour;
     }
+  }
+
+  @override
+  Future<void> updateTour(Tour tour) async {
+    // delete points
+    final pointsToRemove = tour.pointsOfInterest.where(
+      (e) => e.removed && e.id != null,
+    );
+    for (final point in pointsToRemove) {
+      final pointObject = ParseObject('PointOfInterest')..objectId = point.id;
+      await pointObject.delete();
+    }
+    print('deleted: ${pointsToRemove.length}');
+
+    final objects = <ParseObject>[];
+
+    // update points
+    final pointsToUpdate = tour.pointsOfInterest.where(
+      (e) => !e.removed && e.id != null,
+    );
+    for (final point in pointsToUpdate) {
+      final pointObject = ParseObject('PointOfInterest')
+        ..objectId = point.id
+        ..set(
+            'position',
+            ParseGeoPoint(
+              latitude: point.position.latitude,
+              longitude: point.position.longitude,
+            ))
+        ..set('title', point.titel)
+        ..set('desctiption', point.description);
+      final apiResponse = await pointObject.save();
+      if (apiResponse.success && apiResponse.results != null) {
+        objects.add(apiResponse.results?.first as ParseObject);
+      }
+    }
+    print('updated: ${pointsToUpdate.length}');
+
+    // create points
+    final pointsToCreate = tour.pointsOfInterest.where(
+      (e) => !e.removed && e.id == null,
+    );
+    for (final point in pointsToCreate) {
+      final pointObject = ParseObject('PointOfInterest')
+        ..set(
+            'position',
+            ParseGeoPoint(
+              latitude: point.position.latitude,
+              longitude: point.position.longitude,
+            ))
+        ..set('title', point.titel)
+        ..set('desctiption', point.description);
+      final apiResponse = await pointObject.save();
+      if (apiResponse.success && apiResponse.results != null) {
+        objects.add(apiResponse.results?.first as ParseObject);
+      }
+    }
+    print('created: ${pointsToCreate.length}');
+
+    var newTour = ParseObject('Track')
+      ..objectId = tour.id
+      ..set('stations', objects);
+    await newTour.save();
+    print('+++ saved');
   }
 }
 

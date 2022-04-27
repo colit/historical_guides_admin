@@ -19,5 +19,7 @@ abstract class ICloudDataRepository {
 
   Future<Tour> getTourDetails(String tourId);
 
+  Future<void> updateTour(Tour tour);
+
   // Future<void> createUUIDs();
 }

@@ -29,10 +29,12 @@ class EditPoIModel extends BaseModel {
 
   void removePoint() {
     _mapService.removePoint();
+    notifyListeners();
   }
 
   void addPoint() {
     _mapService.createPoint();
+    notifyListeners();
   }
 
   void onChangeTitel(String value) {

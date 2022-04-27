@@ -30,6 +30,9 @@ class TourInfosView extends StatelessWidget {
                 appBar: AppBar(
                   title: Text(model.tour!.name),
                 ),
+                floatingActionButton: model.tourUpdated
+                    ? FloatingActionButton(onPressed: model.saveTour)
+                    : null,
                 body: CustomScrollView(
                   slivers: [
                     SliverToBoxAdapter(
@@ -58,16 +61,31 @@ class TourInfosView extends StatelessWidget {
                               children: [
                                 const Text('Sehenswürdigkeiten'),
                                 ListView.builder(
-                                  physics: NeverScrollableScrollPhysics(),
+                                  physics: const NeverScrollableScrollPhysics(),
                                   shrinkWrap: true,
-                                  itemCount:
-                                      model.tour!.pointsOfInterest.length,
+                                  itemCount: model.pointsOfInterest.length,
                                   itemBuilder:
-                                      (BuildContext context, int index) =>
-                                          Container(
-                                    padding: EdgeInsets.all(8),
-                                    child: Text(model
-                                        .tour!.pointsOfInterest[index].titel),
+                                      (BuildContext context, int index) => Row(
+                                    children: [
+                                      Expanded(
+                                        child: Container(
+                                          padding: const EdgeInsets.all(8),
+                                          child: Text(model
+                                              .pointsOfInterest[index].titel),
+                                        ),
+                                      ),
+                                      Material(
+                                        child: InkWell(
+                                          onTap: () => model.deletePoint(index),
+                                          child: const Padding(
+                                            padding: EdgeInsets.all(8),
+                                            child: Icon(
+                                              Icons.delete,
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    ],
                                   ),
                                 ),
                                 ElevatedButton(

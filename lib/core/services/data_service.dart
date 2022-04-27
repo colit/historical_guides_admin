@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geojson_vi/geojson_vi.dart';
 import 'package:historical_guides_admin/core/services/interfaces/i_cloud_data_repository.dart';
 import 'package:historical_guides_commons/historical_guides_commons.dart';
 import 'package:latlong2/latlong.dart';
@@ -67,6 +68,15 @@ class DataService extends ChangeNotifier {
       description: description,
     ));
     _currentTour = _currentTour!.copyWith(pointsOfInterest: pois);
+    notifyListeners();
+  }
+
+  Future<void> saveTour() async {
+    await _cloudDataRepository.updateTour(_currentTour!);
+  }
+
+  void updatePointsInTour(List<PointOfInterest> points) {
+    _currentTour = _currentTour!.copyWith(pointsOfInterest: points);
     notifyListeners();
   }
 }
