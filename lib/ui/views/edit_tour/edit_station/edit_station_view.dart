@@ -41,8 +41,8 @@ class EditStationView extends StatelessWidget {
           body: Consumer<MapFeaturePoint?>(
             builder: (context, value, child) {
               final pointOnMap = value != null;
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
+              return SingleChildScrollView(
+                padding: const EdgeInsets.all(UIHelper.kHorizontalSpaceMedium),
                 child: Column(
                   children: [
                     Row(

@@ -39,8 +39,8 @@ class _TextInputWidgetState extends State<TextInputWidget> {
       color: changed ? const Color(0xffeeeeee) : kColorWhite,
       child: TextField(
         controller: controller,
-        maxLines: widget.maxLines,
-        keyboardType: TextInputType.text,
+        keyboardType: TextInputType.multiline,
+        maxLines: null,
         textCapitalization: TextCapitalization.none,
         autocorrect: false,
         onChanged: (value) {
