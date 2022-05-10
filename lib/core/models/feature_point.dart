@@ -7,4 +7,11 @@ class MapFeaturePoint {
   });
   final String id;
   final LatLng position;
+
+  MapFeaturePoint copyWith({LatLng? position}) {
+    return MapFeaturePoint(
+      id: id,
+      position: position ?? this.position,
+    );
+  }
 }

@@ -16,10 +16,8 @@ class TourInfosModel extends BaseModel {
   final MapService _mapService;
 
   Tour? get tour => _dataService.currentTour;
-  List<PointOfInterest> get pointsOfInterest =>
-      _dataService.currentTour?.pointsOfInterest
-          .where((e) => !e.removed)
-          .toList() ??
+  List<Station> get pointsOfInterest =>
+      _dataService.currentTour?.stations.where((e) => !e.removed).toList() ??
       [];
 
   bool _tourUpdated = false;
@@ -54,10 +52,27 @@ class TourInfosModel extends BaseModel {
 
   void deletePoint(int index) {
     if (tour == null) return;
-    final points = tour!.pointsOfInterest;
+    final points = tour!.stations;
     final p = points.removeAt(index);
     points.insert(index, p.copyWith(removed: true));
-    _dataService.updatePointsInTour(points);
+    _dataService.updateTour(tour?.copyWith(stations: points));
+  }
+
+  void updateTourDescription(String value) {
+    final newTour = tour?.copyWith(description: value);
+    _dataService.updateTour(newTour);
     _tourUpdated = true;
+  }
+
+  void updateTourName(String value) {
+    final newTour = tour?.copyWith(name: value);
+    _dataService.updateTour(newTour);
+    _tourUpdated = true;
+  }
+
+  void updateStationsOrder(int oldIndex, int newIndex) {
+    _dataService.updateStationsOrder(oldIndex, newIndex);
+    _tourUpdated = true;
+    notifyListeners();
   }
 }

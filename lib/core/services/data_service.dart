@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:geojson_vi/geojson_vi.dart';
 import 'package:historical_guides_admin/core/services/interfaces/i_cloud_data_repository.dart';
 import 'package:historical_guides_commons/historical_guides_commons.dart';
 import 'package:latlong2/latlong.dart';
@@ -55,28 +54,68 @@ class DataService extends ChangeNotifier {
   }
 
   void updateCurrentTour({
+    required String id,
     required double latitude,
     required double longitude,
     required String title,
     String? description,
   }) {
     if (_currentTour == null) return;
-    var pois = _currentTour!.pointsOfInterest;
-    pois.add(PointOfInterest(
+    final pois = _currentTour!.stations;
+    final index = pois.indexWhere((e) => e.id == id);
+    print('update $id on $index');
+    final station = Station(
+      id: id,
       titel: title,
       position: LatLng(latitude, longitude),
       description: description,
-    ));
-    _currentTour = _currentTour!.copyWith(pointsOfInterest: pois);
+    );
+    if (index < 0) {
+      pois.add(station);
+    } else {
+      pois
+        ..removeAt(index)
+        ..insert(index, station);
+    }
+    _currentTour = _currentTour!.copyWith(stations: pois);
     notifyListeners();
   }
 
   Future<void> saveTour() async {
+    print(_currentTour!.name);
     await _cloudDataRepository.updateTour(_currentTour!);
   }
 
-  void updatePointsInTour(List<PointOfInterest> points) {
-    _currentTour = _currentTour!.copyWith(pointsOfInterest: points);
+  void updateTour(Tour? newTour) {
+    _currentTour = newTour;
+    notifyListeners();
+  }
+
+  void updateStationsOrder(int oldIndex, int newIndex) {
+    if (_currentTour == null) return;
+    // get all stations were not removed
+    final visibleStations =
+        _currentTour!.stations.where((e) => !e.removed).toList();
+    // reorder stations
+    visibleStations.insert(
+      newIndex <= oldIndex ? newIndex : newIndex - 1,
+      visibleStations.removeAt(oldIndex),
+    );
+    // add removed stations
+    visibleStations.addAll(_currentTour!.stations.where((e) => e.removed));
+    // update stations in tour
+    _currentTour = _currentTour!.copyWith(stations: visibleStations);
+  }
+
+  void hideStation(String id) {
+    if (_currentTour != null) {
+      _currentTour = _currentTour?.hideStation(id);
+      // notifyListeners();
+    }
+  }
+
+  void onLeaveEditorPage() {
+    _currentTour = _currentTour?.showAllStations();
     notifyListeners();
   }
 }

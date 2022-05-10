@@ -229,7 +229,7 @@ class ParseServerRepository implements ICloudDataRepository {
     } else {
       final tour = Tour.fromGraphQL(
           List.from(result.data?['tracks']['edges']).first['node']);
-      print('loaded tour with ${tour.pointsOfInterest.length} points');
+      print('loaded tour with ${tour.stations.length} points');
       return tour;
     }
   }
@@ -237,8 +237,8 @@ class ParseServerRepository implements ICloudDataRepository {
   @override
   Future<void> updateTour(Tour tour) async {
     // delete points
-    final pointsToRemove = tour.pointsOfInterest.where(
-      (e) => e.removed && e.id != null,
+    final pointsToRemove = tour.stations.where(
+      (e) => e.removed,
     );
     for (final point in pointsToRemove) {
       final pointObject = ParseObject('PointOfInterest')..objectId = point.id;
@@ -249,10 +249,11 @@ class ParseServerRepository implements ICloudDataRepository {
     final objects = <ParseObject>[];
 
     // update points
-    final pointsToUpdate = tour.pointsOfInterest.where(
-      (e) => !e.removed && e.id != null,
+    final pointsToUpdate = tour.stations.where(
+      (e) => !e.removed && !e.id.contains('new'),
     );
     for (final point in pointsToUpdate) {
+      print(point.description);
       final pointObject = ParseObject('PointOfInterest')
         ..objectId = point.id
         ..set(
@@ -262,7 +263,7 @@ class ParseServerRepository implements ICloudDataRepository {
               longitude: point.position.longitude,
             ))
         ..set('title', point.titel)
-        ..set('desctiption', point.description);
+        ..set('description', point.description);
       final apiResponse = await pointObject.save();
       if (apiResponse.success && apiResponse.results != null) {
         objects.add(apiResponse.results?.first as ParseObject);
@@ -271,9 +272,8 @@ class ParseServerRepository implements ICloudDataRepository {
     print('updated: ${pointsToUpdate.length}');
 
     // create points
-    final pointsToCreate = tour.pointsOfInterest.where(
-      (e) => !e.removed && e.id == null,
-    );
+    final pointsToCreate =
+        tour.stations.where((e) => !e.removed && e.id.contains('new'));
     for (final point in pointsToCreate) {
       final pointObject = ParseObject('PointOfInterest')
         ..set(
@@ -283,7 +283,7 @@ class ParseServerRepository implements ICloudDataRepository {
               longitude: point.position.longitude,
             ))
         ..set('title', point.titel)
-        ..set('desctiption', point.description);
+        ..set('description', point.description);
       final apiResponse = await pointObject.save();
       if (apiResponse.success && apiResponse.results != null) {
         objects.add(apiResponse.results?.first as ParseObject);
@@ -293,6 +293,8 @@ class ParseServerRepository implements ICloudDataRepository {
 
     var newTour = ParseObject('Track')
       ..objectId = tour.id
+      ..set('name', tour.name)
+      ..set('description', tour.description)
       ..set('stations', objects);
     await newTour.save();
     print('+++ saved');

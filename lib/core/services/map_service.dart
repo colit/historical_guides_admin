@@ -30,7 +30,7 @@ class MapService extends ChangeNotifier {
     );
   }
 
-  void enablePoints() {
+  void enablePointsEdit() {
     _addPointEnabled = true;
   }
 
@@ -38,9 +38,27 @@ class MapService extends ChangeNotifier {
     _addPointEnabled = false;
   }
 
-  void updateCurrentPoint(String id, LatLng current) {
+  void showPoint(String id, double latitude, double longitude) {
     _currentPoint = MapFeaturePoint(
       id: id,
+      position: LatLng(latitude, longitude),
+    );
+
+    _currentPointStreamController.add(_currentPoint);
+    notifyListeners();
+  }
+
+  void createPoint() {
+    _currentPoint = MapFeaturePoint(
+      id: 'new_${DateTime.now().millisecondsSinceEpoch}',
+      position: _mapPosition,
+    );
+    _currentPointStreamController.add(_currentPoint);
+    notifyListeners();
+  }
+
+  void updateCurrentPoint(LatLng current) {
+    _currentPoint = _currentPoint!.copyWith(
       position: current,
     );
     _currentPointStreamController.add(_currentPoint);
@@ -55,15 +73,6 @@ class MapService extends ChangeNotifier {
   void onLeaveEditorPage() {
     removePoint();
     disablePoints();
-  }
-
-  void createPoint() {
-    _currentPoint = MapFeaturePoint(
-      id: 'point',
-      position: _mapPosition,
-    );
-    _currentPointStreamController.add(_currentPoint);
-    notifyListeners();
   }
 
   void updateCameraPosition(LatLng position) {

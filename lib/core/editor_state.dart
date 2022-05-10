@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:historical_guides_commons/historical_guides_commons.dart';
 
-import '../ui/views/edit_tour/edit-poi/edit_poi_view.dart';
+import '../ui/views/edit_tour/edit_station/edit_station_view.dart';
 import '../ui/views/edit_tour/tour_infos/tour_infos_view.dart';
 
 class EditorState extends ChangeNotifier {
@@ -42,7 +43,9 @@ class EditorState extends ChangeNotifier {
       case 'poi_editor':
         return MaterialPage(
           key: ValueKey(settings.name),
-          child: const EditPoIView(),
+          child: EditStationView(
+            station: settings.arguments as Station?,
+          ),
         );
       default:
         return MaterialPage(

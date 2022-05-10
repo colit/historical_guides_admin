@@ -2,31 +2,37 @@ import 'package:flutter/material.dart';
 import 'package:historical_guides_admin/core/editor_state.dart';
 import 'package:historical_guides_admin/core/models/feature_point.dart';
 import 'package:historical_guides_admin/ui/widgets/round_icon_button.dart';
+import 'package:historical_guides_admin/ui/widgets/text_input_widget.dart';
 import 'package:historical_guides_commons/historical_guides_commons.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/services/data_service.dart';
 import '../../../../core/services/map_service.dart';
-import 'edit_poi_model.dart';
+import 'edit_station_model.dart';
 
-class EditPoIView extends StatelessWidget {
-  const EditPoIView({Key? key}) : super(key: key);
+class EditStationView extends StatelessWidget {
+  const EditStationView({
+    Key? key,
+    this.station,
+  }) : super(key: key);
+
+  final Station? station;
 
   @override
   Widget build(BuildContext context) {
-    return BaseWidget<EditPoIModel>(
-      model: EditPoIModel(
+    return BaseWidget<EditStationModel>(
+      model: EditStationModel(
         mapService: context.read<MapService>(),
         dataService: context.read<DataService>(),
         editorState: context.read<EditorState>(),
       ),
-      onModelReady: (model) => model.createPoint(),
+      onModelReady: (model) => model.initModelWith(station),
       builder: (context, model, child) {
         return Scaffold(
           appBar: AppBar(
             title: const Text('Edit PoI'),
           ),
-          floatingActionButton: model.editComplete
+          floatingActionButton: model.editComplete || !model.pointRemovable
               ? FloatingActionButton(
                   child: const Icon(Icons.add),
                   onPressed: model.savePoint,
@@ -68,7 +74,7 @@ class EditPoIView extends StatelessWidget {
                                   ),
                                 ),
                         ),
-                        if (pointOnMap)
+                        if (pointOnMap && model.pointRemovable)
                           RoundIconButton(
                             icon: const Icon(Icons.close),
                             onTap: () => model.removePoint(),
@@ -76,35 +82,17 @@ class EditPoIView extends StatelessWidget {
                       ],
                     ),
                     UIHelper.verticalSpaceSmall(),
-                    TextField(
-                      maxLines: 1,
-                      keyboardType: TextInputType.text,
-                      textCapitalization: TextCapitalization.none,
-                      autocorrect: false,
-                      onChanged: model.onChangeTitel,
-                      decoration: const InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.white)),
-                        labelText: 'Titel',
-                      ),
+                    TextInputWidget(
+                      value: model.titel,
+                      onChange: model.onChangeTitel,
+                      labelText: 'Name',
                     ),
                     UIHelper.verticalSpaceSmall(),
-                    TextField(
+                    TextInputWidget(
+                      value: model.description,
+                      onChange: model.onChangeDescription,
                       maxLines: 20,
-                      keyboardType: TextInputType.text,
-                      textCapitalization: TextCapitalization.none,
-                      autocorrect: false,
-                      onChanged: model.onChangeDescription,
-                      decoration: const InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.white)),
-                        labelText: 'Beschreibung',
-                        alignLabelWithHint: true,
-                      ),
+                      labelText: 'Beschreibung',
                     ),
                   ],
                 ),

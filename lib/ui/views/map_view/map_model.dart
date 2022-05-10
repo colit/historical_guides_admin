@@ -35,17 +35,8 @@ class MapModel extends BaseModel {
   bool _pointsAdded = false;
 
   void _onDataUpdated() {
-    final source = _dataService.currentTour?.poisAsGeoJson;
+    final source = _dataService.currentTour?.stationsAsGeoJson;
     _controller?.setGeoJsonSource('map_points_source', source!);
-    // print(_dataService.currentTour?.poisAsGeoJson ?? 'no tour found');
-    // print(_dataService.currentTour?.geoJSON ?? 'no track found');
-    // final source = _dataService.currentTour?.poisAsGeoJson;
-    // if (source != null) {
-    //   _controller?.setGeoJsonSource('kPhotoSourceId', source);
-    // }
-    // if (_dataService.currentTour?.geoJSON != null && !_trackAdded) {
-    //   _addTrackSource();
-    // }
   }
 
   void _onMapUpdated() {
@@ -55,8 +46,7 @@ class MapModel extends BaseModel {
       _addTrackSource();
     }
 
-    final source = _dataService.currentTour?.poisAsGeoJson;
-    print('source: $source');
+    final source = _dataService.currentTour?.stationsAsGeoJson;
 
     if (source != null) {
       if (!_pointsAdded) {
@@ -112,12 +102,13 @@ class MapModel extends BaseModel {
     id, {
     required LatLng current,
     required LatLng delta,
+    required DragEventType eventType,
     required LatLng origin,
     required Point<double> point,
   }) {
     final position = _circle?.options.geometry;
     if (position != null) {
-      _mapService.updateCurrentPoint(id, position);
+      _mapService.updateCurrentPoint(position);
     }
   }
 
@@ -203,20 +194,14 @@ class MapModel extends BaseModel {
         )
             .then((value) {
           _circle = value;
-          _mapService.updateCurrentPoint(
-            _circle!.id,
-            position,
-          );
+          _mapService.updateCurrentPoint(position);
         });
       } else {
         _controller!.updateCircle(
           _circle!,
           CircleOptions(geometry: position),
         );
-        _mapService.updateCurrentPoint(
-          _circle!.id,
-          position,
-        );
+        _mapService.updateCurrentPoint(position);
       }
     }
   }
