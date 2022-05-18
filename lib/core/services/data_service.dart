@@ -42,7 +42,10 @@ class DataService extends ChangeNotifier {
     return tours;
   }
 
-  Future<void> getImages() async {}
+  Future<List<ImageEntity>> getImages() async {
+    final images = _cloudDataRepository.getImages();
+    return images;
+  }
 
   Future<bool> removeTour(String id) async {
     return await _cloudDataRepository.deleteTour(id);
@@ -117,5 +120,9 @@ class DataService extends ChangeNotifier {
   void onLeaveEditorPage() {
     _currentTour = _currentTour?.showAllStations();
     notifyListeners();
+  }
+
+  Future<ImageEntity> getImageDetails(int id) {
+    return _cloudDataRepository.getImageDetails(id);
   }
 }

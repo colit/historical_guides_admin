@@ -299,6 +299,55 @@ class ParseServerRepository implements ICloudDataRepository {
     await newTour.save();
     print('+++ saved');
   }
+
+  @override
+  Future<List<ImageEntity>> getImages() async {
+    var images = QueryBuilder(ParseObject('Image'));
+    // ..selectKeys('objectId', null)
+    // ..selectKeys('image', null)
+    // ..selectKeys('title', null);
+
+    final apiResponse = await images.query();
+    if (apiResponse.success && apiResponse.results != null) {
+      final output = apiResponse.results!.map((e) {
+        final object = e as ParseObject;
+        final position = object.get('location') as ParseGeoPoint;
+        final image = object.get(ImageEntity.keyImage) as ParseWebFile;
+        return ImageEntity.fromMap({
+          ImageEntity.keyObjectId: object.get('uuid'),
+          ImageEntity.keyTitle: object.get(ImageEntity.keyTitle),
+          ImageEntity.keyDescription: object.get(ImageEntity.keyDescription),
+          ImageEntity.keyLatitude: position.latitude,
+          ImageEntity.keyLongitude: position.longitude,
+          ImageEntity.keyImage: image.url,
+        });
+      }).toList();
+      return (output);
+    }
+    throw (apiResponse.error.toString());
+  }
+
+  @override
+  Future<ImageEntity> getImageDetails(int imageId) async {
+    final options = QueryOptions(
+      document: gql(GraphQLQueries.getImageDetails),
+      variables: {'id': imageId},
+    );
+    final result = await client.query(options);
+    if (result.hasException) {
+      final message =
+          result.exception?.graphqlErrors.first.message ?? 'Server Error';
+      throw GeneralExeption(title: 'graphQL Exception', message: message);
+    } else {
+      try {
+        final node = List.from(result.data?['images']['edges']).first['node'];
+        return ImageEntity.fromQuery(node);
+      } catch (_) {
+        throw GeneralExeption(
+            title: 'graphQL Exception', message: 'Data error');
+      }
+    }
+  }
 }
 
 // --------- Upload file with Parse SDK

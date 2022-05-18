@@ -21,5 +21,9 @@ abstract class ICloudDataRepository {
 
   Future<void> updateTour(Tour tour);
 
+  Future<List<ImageEntity>> getImages();
+
+  Future<ImageEntity> getImageDetails(int id);
+
   // Future<void> createUUIDs();
 }

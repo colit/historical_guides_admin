@@ -6,6 +6,9 @@ class ImagesModel extends BaseModel {
 
   final DataService _dataService;
 
+  List<ImageEntity> _images = [];
+  List<ImageEntity> get images => _images;
+
   void getImages() {
     setState(ViewState.busy);
   }
@@ -13,5 +16,14 @@ class ImagesModel extends BaseModel {
   void createUUIDs() {
     // setState(ViewState.busy);
     // _dataService.createUUIDs().then((_) => setState(ViewState.idle));
+  }
+
+  void initModel() {
+    setState(ViewState.busy);
+    _dataService.getImages().then((images) {
+      print('found: ${images.length}');
+      _images = images;
+      setState(ViewState.idle);
+    });
   }
 }

@@ -45,7 +45,7 @@ class MapService extends ChangeNotifier {
     );
 
     _currentPointStreamController.add(_currentPoint);
-    notifyListeners();
+    // notifyListeners();
   }
 
   void createPoint() {

@@ -40,8 +40,10 @@ class MapModel extends BaseModel {
   }
 
   void _onMapUpdated() {
+    print('_onMapUpdated: $_controller');
     if (_controller == null) return;
 
+    print('_onMapUpdated()');
     if (_dataService.currentTour?.geoJSON != null && !_trackAdded) {
       _addTrackSource();
     }
@@ -83,6 +85,7 @@ class MapModel extends BaseModel {
       _circle = null;
     }
 
+    print(_mapService.pointToCreate);
     if (_mapService.pointToCreate != null && _circle == null) {
       _controller!
           .addCircle(
@@ -179,6 +182,7 @@ class MapModel extends BaseModel {
 
   void onMapCreated(MapboxMapController controller) {
     _controller = controller;
+    print('onMapCreated() $_controller');
   }
 
   void onMapClick(Point<double> point, LatLng position) {
@@ -214,7 +218,7 @@ class MapModel extends BaseModel {
   }
 
   void onStyleLoadedCallback() {
-    print('onStyleLoade');
+    print('onStyleLoaded()');
     _controller!.onFeatureDrag.add(_onFeatureDrag);
     _controller!.onFeatureTapped.add((id, point, coordinates) {
       print('feature tapped: $point');
@@ -236,6 +240,7 @@ class MapModel extends BaseModel {
 
   @override
   void dispose() {
+    print('dispose');
     _mapService.removeListener(_onMapUpdated);
     _dataService.removeListener(_onDataUpdated);
     super.dispose();

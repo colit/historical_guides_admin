@@ -24,6 +24,7 @@ class MapView extends StatelessWidget {
           dataService: context.read<DataService>(),
         ),
         builder: (context, model, child) {
+          print('redraw map');
           return MapboxMap(
             accessToken: dotenv.env['ACCESS_TOKEN']!,
             onMapCreated: (controller) => model.onMapCreated(controller),
