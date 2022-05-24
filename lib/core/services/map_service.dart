@@ -45,7 +45,7 @@ class MapService extends ChangeNotifier {
     );
 
     _currentPointStreamController.add(_currentPoint);
-    // notifyListeners();
+    notifyListeners();
   }
 
   void createPoint() {
@@ -58,9 +58,11 @@ class MapService extends ChangeNotifier {
   }
 
   void updateCurrentPoint(LatLng current) {
+    if (_currentPoint == null) return;
     _currentPoint = _currentPoint!.copyWith(
       position: current,
     );
+    notifyListeners();
     _currentPointStreamController.add(_currentPoint);
   }
 

@@ -12,13 +12,14 @@ class MapModel extends BaseModel {
     required DataService dataService,
   })  : _mapService = mapService,
         _dataService = dataService {
+    print('------ init MapModel()');
     _mapService.addListener(_onMapUpdated);
     _dataService.addListener(_onDataUpdated);
   }
 
   // late final String _tourId;
 
-  MapboxMapController? _controller;
+  late final MapboxMapController _controller;
 
   final MapService _mapService;
   final DataService _dataService;
@@ -34,16 +35,16 @@ class MapModel extends BaseModel {
   bool _trackAdded = false;
   bool _pointsAdded = false;
 
+  bool _mapCreated = false;
+
   void _onDataUpdated() {
     final source = _dataService.currentTour?.stationsAsGeoJson;
-    _controller?.setGeoJsonSource('map_points_source', source!);
+    _controller.setGeoJsonSource('map_points_source', source!);
   }
 
   void _onMapUpdated() {
+    print('_mapCreated: $_mapCreated');
     print('_onMapUpdated: $_controller');
-    if (_controller == null) return;
-
-    print('_onMapUpdated()');
     if (_dataService.currentTour?.geoJSON != null && !_trackAdded) {
       _addTrackSource();
     }
@@ -53,10 +54,10 @@ class MapModel extends BaseModel {
     if (source != null) {
       if (!_pointsAdded) {
         _controller
-            ?.addSource(
+            .addSource(
                 'map_points_source', GeojsonSourceProperties(data: source))
             .then((_) {
-          _controller?.addLayer(
+          _controller.addLayer(
             'map_points_source',
             'points',
             const CircleLayerProperties(
@@ -65,13 +66,13 @@ class MapModel extends BaseModel {
           _pointsAdded = true;
         });
       } else {
-        _controller?.setGeoJsonSource('map_points_source', source);
+        _controller.setGeoJsonSource('map_points_source', source);
       }
     }
 
     final bounds = _mapService.mapBounds;
     if (bounds != null) {
-      _controller!
+      _controller
           .animateCamera(CameraUpdate.newLatLngBounds(bounds))
           .then((success) {
         if (success ?? false) {
@@ -81,13 +82,13 @@ class MapModel extends BaseModel {
     }
 
     if (!_mapService.acivePointEditing && _circle != null) {
-      _controller!.removeCircle(_circle!);
+      _controller.removeCircle(_circle!);
       _circle = null;
     }
 
     print(_mapService.pointToCreate);
     if (_mapService.pointToCreate != null && _circle == null) {
-      _controller!
+      _controller
           .addCircle(
         CircleOptions(
             geometry: _mapService.pointToCreate!.position,
@@ -117,7 +118,7 @@ class MapModel extends BaseModel {
 
   Future<void> _addTrackSource() async {
     if (_controller == null) return;
-    await _controller!.addSource(
+    await _controller.addSource(
       'map_track_source',
       GeojsonSourceProperties(data: _dataService.currentTour?.geoJSON),
     );
@@ -128,7 +129,7 @@ class MapModel extends BaseModel {
 
   Future<void> _addPointsSource() async {
     if (_controller != null) {
-      await _controller!.addSource(
+      await _controller.addSource(
         'kPhotoSourceId',
         const GeojsonSourceProperties(
           maxzoom: 14.5,
@@ -140,7 +141,7 @@ class MapModel extends BaseModel {
   Future<void> _createLayers() async {
     // create track line
 
-    await _controller!.addLayer(
+    await _controller.addLayer(
       'map_track_source',
       "track-line-white",
       const LineLayerProperties(
@@ -150,7 +151,7 @@ class MapModel extends BaseModel {
     );
 
     // Symbols Layer
-    await _controller!.addLayer(
+    await _controller.addLayer(
       'kPhotoSourceId',
       "photo-points-white",
       const CircleLayerProperties(
@@ -160,7 +161,7 @@ class MapModel extends BaseModel {
     );
 
     // create track line
-    await _controller!.addLayer(
+    await _controller.addLayer(
       'map_track_source',
       "track-line",
       const LineLayerProperties(
@@ -170,7 +171,7 @@ class MapModel extends BaseModel {
     );
 
     // Symbols Layer
-    await _controller!.addLayer(
+    await _controller.addLayer(
       'kPhotoSourceId',
       "photo-points",
       const CircleLayerProperties(
@@ -182,13 +183,14 @@ class MapModel extends BaseModel {
 
   void onMapCreated(MapboxMapController controller) {
     _controller = controller;
+    _mapCreated = true;
     print('onMapCreated() $_controller');
   }
 
   void onMapClick(Point<double> point, LatLng position) {
     if (_mapService.addPointEnabled && _controller != null) {
       if (_circle == null) {
-        _controller!
+        _controller
             .addCircle(
           CircleOptions(
               geometry: position,
@@ -201,7 +203,7 @@ class MapModel extends BaseModel {
           _mapService.updateCurrentPoint(position);
         });
       } else {
-        _controller!.updateCircle(
+        _controller.updateCircle(
           _circle!,
           CircleOptions(geometry: position),
         );
@@ -211,7 +213,7 @@ class MapModel extends BaseModel {
   }
 
   void onCameraIdle() {
-    final cameraPosition = _controller?.cameraPosition;
+    final cameraPosition = _controller.cameraPosition;
     if (cameraPosition != null) {
       _mapService.updateCameraPosition(cameraPosition.target);
     }
@@ -219,10 +221,10 @@ class MapModel extends BaseModel {
 
   void onStyleLoadedCallback() {
     print('onStyleLoaded()');
-    _controller!.onFeatureDrag.add(_onFeatureDrag);
-    _controller!.onFeatureTapped.add((id, point, coordinates) {
+    _controller.onFeatureDrag.add(_onFeatureDrag);
+    _controller.onFeatureTapped.add((id, point, coordinates) {
       print('feature tapped: $point');
-      _controller!.queryRenderedFeatures(point, ['points'], null).then((value) {
+      _controller.queryRenderedFeatures(point, ['points'], null).then((value) {
         print('value: $value');
         if (value.isNotEmpty) {
           final geojson = value.first;
@@ -232,7 +234,7 @@ class MapModel extends BaseModel {
             geojson['geometry']['coordinates'],
           );
           final position = LatLng(coordinates[1], coordinates[0]);
-          _controller!.animateCamera(CameraUpdate.newLatLng(position));
+          _controller.animateCamera(CameraUpdate.newLatLng(position));
         }
       });
     });
@@ -240,7 +242,7 @@ class MapModel extends BaseModel {
 
   @override
   void dispose() {
-    print('dispose');
+    print('dispose map model');
     _mapService.removeListener(_onMapUpdated);
     _dataService.removeListener(_onDataUpdated);
     super.dispose();

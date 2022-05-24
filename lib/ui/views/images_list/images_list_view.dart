@@ -35,15 +35,18 @@ class ImagesListView extends StatelessWidget {
                   body: ListView.separated(
                     padding:
                         const EdgeInsets.all(UIHelper.kHorizontalSpaceSmall),
-                    itemCount: model.images.length,
+                    itemCount: model.imagesCount,
                     itemBuilder: (context, index) {
-                      return ImageListElement(
-                        image: model.images[index],
-                        onTap: (id) => context.read<EditorState>().pushPage(
-                              name: EditImageView.viewId,
-                              arguments: id,
-                            ),
-                      );
+                      return model.imagesLoaded(index)
+                          ? ImageListElement(
+                              image: model.images[index],
+                              onTap: (id) =>
+                                  context.read<EditorState>().pushPage(
+                                        name: EditImageView.viewId,
+                                        arguments: id,
+                                      ),
+                            )
+                          : Container();
                     },
                     separatorBuilder: (context, index) =>
                         UIHelper.verticalSpaceSmall(),

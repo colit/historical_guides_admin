@@ -300,9 +300,24 @@ class ParseServerRepository implements ICloudDataRepository {
     print('+++ saved');
   }
 
+  /// ------------------------------------------------
+  /// Images
+  /// ------------------------------------------------
+
   @override
-  Future<List<ImageEntity>> getImages() async {
-    var images = QueryBuilder(ParseObject('Image'));
+  Future<int> countImages() async {
+    final queryImages = QueryBuilder<ParseObject>(ParseObject('Image'));
+    var apiResponse = await queryImages.count();
+    if (apiResponse.success && apiResponse.result != null) {
+      return apiResponse.count;
+    } else {
+      return 0;
+    }
+  }
+
+  @override
+  Future<List<ImageEntity>> getImages(int skip) async {
+    var images = QueryBuilder(ParseObject('Image'))..setAmountToSkip(skip);
     // ..selectKeys('objectId', null)
     // ..selectKeys('image', null)
     // ..selectKeys('title', null);
@@ -312,14 +327,12 @@ class ParseServerRepository implements ICloudDataRepository {
       final output = apiResponse.results!.map((e) {
         final object = e as ParseObject;
         final position = object.get('location') as ParseGeoPoint;
-        final image = object.get(ImageEntity.keyImage) as ParseWebFile;
         return ImageEntity.fromMap({
-          ImageEntity.keyObjectId: object.get('uuid'),
+          ImageEntity.keyId: object.get('uuid'),
+          ImageEntity.keyObjectId: object.get(ImageEntity.keyObjectId),
           ImageEntity.keyTitle: object.get(ImageEntity.keyTitle),
-          ImageEntity.keyDescription: object.get(ImageEntity.keyDescription),
           ImageEntity.keyLatitude: position.latitude,
           ImageEntity.keyLongitude: position.longitude,
-          ImageEntity.keyImage: image.url,
         });
       }).toList();
       return (output);
@@ -347,6 +360,78 @@ class ParseServerRepository implements ICloudDataRepository {
             title: 'graphQL Exception', message: 'Data error');
       }
     }
+  }
+
+  @override
+  Future<void> deleteImage(ImageEntity image) async {
+    print('delete image');
+    print(image.imageName!);
+    print(image.imageURL!);
+
+    final function = ParseCloudFunction('cloudFunction');
+    final params = {'objectId': image.objectId};
+    final ParseResponse parseResponse =
+        await function.executeObjectFunction(parameters: params);
+    if (parseResponse.success) {
+      print(parseResponse.result);
+    } else {
+      print(parseResponse.error);
+    }
+  }
+
+  @override
+  Future<String> uploadImage(Uint8List imageData) async {
+    final parseFile = ParseWebFile(
+      imageData,
+      name: 'image.jpg',
+    );
+    await parseFile.save();
+    return 'url';
+  }
+
+  @override
+  Future<void> updateImage(ImageEntity newImage, Uint8List? imageData) async {
+    print('updateImage()');
+    print(newImage.title);
+    print(newImage.objectId);
+    print(imageData?.length);
+    ParseWebFile? parseFile;
+    if (imageData != null) {
+      // final oldFile = ParseWebFile(null, name: 'null', url: newImage.imageURL);
+      // await oldFile.delete();
+      parseFile =
+          ParseWebFile(imageData, name: '${newImage.title ?? 'image'}.jpg');
+      final responce = await parseFile.save();
+      print('file saved with ${responce.result}');
+    }
+    final image = ParseObject('Image')
+      ..set(
+        'location',
+        ParseGeoPoint(
+          latitude: newImage.latitude,
+          longitude: newImage.longitude,
+        ),
+      )
+      ..set('uuid', newImage.id)
+      ..set('title', newImage.title)
+      ..set('license', newImage.license)
+      ..set('author', newImage.author)
+      ..set('licenseURL', newImage.licenseURL)
+      ..set('published', newImage.yearPublished)
+      ..set('authorURL', newImage.authorURL)
+      ..set('sourceURL', newImage.sourceURL)
+      ..set('source', newImage.source)
+      ..set('description', newImage.description);
+    if (parseFile != null) {
+      image.set('image', parseFile);
+      print('file added');
+    }
+    if (newImage.objectId != null) {
+      image.objectId = newImage.objectId;
+      print('id added');
+    }
+    final apiResponce = await image.save();
+    print('saved with ${apiResponce.error}');
   }
 }
 

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:historical_guides_admin/core/services/interfaces/i_cloud_data_repository.dart';
 import 'package:historical_guides_commons/historical_guides_commons.dart';
@@ -42,8 +44,8 @@ class DataService extends ChangeNotifier {
     return tours;
   }
 
-  Future<List<ImageEntity>> getImages() async {
-    final images = _cloudDataRepository.getImages();
+  Future<List<ImageEntity>> getImages(int cursor) async {
+    final images = _cloudDataRepository.getImages(cursor);
     return images;
   }
 
@@ -124,5 +126,23 @@ class DataService extends ChangeNotifier {
 
   Future<ImageEntity> getImageDetails(int id) {
     return _cloudDataRepository.getImageDetails(id);
+  }
+
+  Future<void> updateImage(
+    ImageEntity newImage, {
+    Uint8List? imageData,
+    bool create = false,
+  }) async {
+    await _cloudDataRepository.updateImage(newImage, imageData);
+    notifyListeners();
+  }
+
+  Future<void> deleteImage(ImageEntity image) async {
+    await _cloudDataRepository.deleteImage(image);
+    notifyListeners();
+  }
+
+  Future<int> countImages() async {
+    return _cloudDataRepository.countImages();
   }
 }

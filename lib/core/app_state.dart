@@ -4,7 +4,6 @@ import 'package:historical_guides_admin/navigation/fade_animation_page.dart';
 import 'package:historical_guides_admin/ui/views/edit_tour/edit_tour_view.dart';
 
 import '../ui/views/create_tour/create_tour_view.dart';
-import '../ui/views/images/images_map_view.dart';
 import '../ui/views/images/images_view.dart';
 import '../ui/views/setup/setup_view.dart';
 import '../ui/views/tours/tours_view.dart';
@@ -83,7 +82,7 @@ class AppState extends ChangeNotifier {
       case ImagesPath.key:
         return FadeAnimationPage(
           key: ValueKey(settings.name),
-          child: const ImagesMapView(),
+          child: const ImagesView(),
         );
       case TourEditPath.key:
         return MaterialPage(

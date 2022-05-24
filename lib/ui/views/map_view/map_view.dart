@@ -18,6 +18,7 @@ class MapView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('draw MapView()');
     return BaseWidget<MapModel>(
         model: MapModel(
           mapService: context.read<MapService>(),
