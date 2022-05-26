@@ -470,7 +470,7 @@ packages:
       path: "../../flutter-mapbox-gl"
       relative: true
     source: path
-    version: "0.15.0"
+    version: "0.16.0"
   mapbox_gl_dart:
     dependency: transitive
     description:
@@ -484,14 +484,14 @@ packages:
       path: "../../flutter-mapbox-gl/mapbox_gl_platform_interface"
       relative: true
     source: path
-    version: "0.15.0"
+    version: "0.16.0"
   mapbox_gl_web:
     dependency: "direct overridden"
     description:
       path: "../../flutter-mapbox-gl/mapbox_gl_web"
       relative: true
     source: path
-    version: "0.15.0"
+    version: "0.16.0"
   markdown:
     dependency: transitive
     description:
@@ -583,6 +583,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.2"
+  pointer_interceptor:
+    dependency: "direct main"
+    description:
+      path: "../../pub_dev/packages/packages/pointer_interceptor"
+      relative: true
+    source: path
+    version: "0.9.3"
   pool:
     dependency: transitive
     description:
@@ -800,4 +807,4 @@ packages:
     version: "3.1.0"
 sdks:
   dart: ">=2.17.0-0 <3.0.0"
-  flutter: ">=2.0.0"
+  flutter: ">=2.10.0"

@@ -433,6 +433,37 @@ class ParseServerRepository implements ICloudDataRepository {
     final apiResponce = await image.save();
     print('saved with ${apiResponce.error}');
   }
+
+  @override
+  Future<List<ImageEntity>> getImagesAroundStation(LatLng point) async {
+    var images = QueryBuilder(ParseObject('Image'))
+      ..whereWithinKilometers(
+          'location',
+          ParseGeoPoint(
+            latitude: point.latitude,
+            longitude: point.longitude,
+          ),
+          0.2);
+    final responce = await images.query();
+    if (responce.success && responce.results != null) {
+      final output = responce.results!.map((e) {
+        final object = e as ParseObject;
+        final position = object.get('location') as ParseGeoPoint;
+        final file = object.get('image') as ParseWebFile;
+        return ImageEntity.fromMap({
+          ImageEntity.keyId: object.get('uuid'),
+          ImageEntity.keyObjectId: object.get(ImageEntity.keyObjectId),
+          ImageEntity.keyTitle: object.get(ImageEntity.keyTitle),
+          ImageEntity.keyLatitude: position.latitude,
+          ImageEntity.keyLongitude: position.longitude,
+          ImageEntity.keyImage: file.url,
+        });
+      }).toList();
+      return (output);
+    } else {
+      return [];
+    }
+  }
 }
 
 // --------- Upload file with Parse SDK

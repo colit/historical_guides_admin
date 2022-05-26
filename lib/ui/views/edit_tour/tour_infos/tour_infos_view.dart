@@ -98,7 +98,7 @@ class TourInfosView extends StatelessWidget {
                                   onPressed: () => context
                                       .read<EditorState>()
                                       .pushPage(name: 'poi_editor'),
-                                  child: const Text('Add Point of Interest'),
+                                  child: const Text('Neue Station hinzufügen'),
                                 )
                               ],
                             ),

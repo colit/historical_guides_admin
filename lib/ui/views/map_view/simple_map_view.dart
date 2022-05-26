@@ -2,12 +2,14 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:historical_guides_admin/core/services/data_service.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/services/map_service.dart';
 
 class SimpleMapView extends StatefulWidget {
+  static const double zoomPadding = 60;
   const SimpleMapView({
     Key? key,
     required this.onMapReady,
@@ -21,9 +23,12 @@ class SimpleMapView extends StatefulWidget {
 
 class _SimpleMapViewState extends State<SimpleMapView> {
   late final _mapService = context.read<MapService>();
+  late final _dataService = context.read<DataService>();
+
   late final MapboxMapController _mapController;
 
   Circle? circle;
+  bool _trackAdded = false;
 
   void _onMapReady() {
     widget.onMapReady?.call();
@@ -56,6 +61,10 @@ class _SimpleMapViewState extends State<SimpleMapView> {
   }
 
   void _onMapUpdate() {
+    // Add track
+    if (_dataService.currentTour?.geoJSON != null && !_trackAdded) {
+      _addTrackSource();
+    }
     // Update current editable point on map
     if (_mapService.pointToCreate != null && circle == null) {
       // place cirle
@@ -82,6 +91,75 @@ class _SimpleMapViewState extends State<SimpleMapView> {
             geometry: _mapService.pointToCreate!.position,
           ));
     }
+    // zoom map
+    final bounds = _mapService.mapBounds;
+    if (bounds != null) {
+      _mapController
+          .animateCamera(CameraUpdate.newLatLngBounds(
+        bounds,
+        left: SimpleMapView.zoomPadding,
+        right: SimpleMapView.zoomPadding,
+        top: SimpleMapView.zoomPadding,
+        bottom: SimpleMapView.zoomPadding,
+      ))
+          .then((success) {
+        if (success ?? false) {
+          _mapService.cleanBounds();
+        }
+      });
+    }
+  }
+
+  Future<void> _addTrackSource() async {
+    await _mapController.addSource(
+      'map_track_source',
+      GeojsonSourceProperties(data: _dataService.currentTour?.geoJSON),
+    );
+    _trackAdded = true;
+    _createLayers();
+  }
+
+  Future<void> _createLayers() async {
+    // create track line
+
+    await _mapController.addLayer(
+      'map_track_source',
+      'track-line-white',
+      const LineLayerProperties(
+        lineColor: '#FFFFFF',
+        lineWidth: 9.0,
+      ),
+    );
+
+    // Symbols Layer
+    await _mapController.addLayer(
+      'kPhotoSourceId',
+      'photo-points-white',
+      const CircleLayerProperties(
+        circleColor: '#FFFFFF',
+        circleRadius: 16,
+      ),
+    );
+
+    // create track line
+    await _mapController.addLayer(
+      'map_track_source',
+      "track-line",
+      const LineLayerProperties(
+        lineColor: '#018b00',
+        lineWidth: 3.0,
+      ),
+    );
+
+    // Symbols Layer
+    await _mapController.addLayer(
+      'kPhotoSourceId',
+      "photo-points",
+      const CircleLayerProperties(
+        circleColor: '#003366',
+        circleRadius: 10,
+      ),
+    );
   }
 
   @override

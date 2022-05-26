@@ -7,6 +7,7 @@ import '../../../core/editor_state.dart';
 import '../../../navigation/editor_router_delegate.dart';
 import '../../widgets/round_icon_button.dart';
 import '../map_view/map_view.dart';
+import '../map_view/simple_map_view.dart';
 
 class EditTourView extends StatefulWidget {
   const EditTourView({Key? key, required this.id}) : super(key: key);
@@ -36,7 +37,7 @@ class _EditTourViewState extends State<EditTourView> {
           flex: 5,
           child: Stack(
             children: [
-              MapView(onMapReady: () {
+              SimpleMapView(onMapReady: () {
                 if (!mapIsReady) {
                   context.read<EditorState>().setInitialPageWith(widget.id);
                   setState(() {

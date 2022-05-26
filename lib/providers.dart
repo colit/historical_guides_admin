@@ -7,6 +7,7 @@ import 'core/app_state.dart';
 import 'core/editor_state.dart';
 import 'core/repositories/parse_server_repository.dart';
 import 'core/services/data_service.dart';
+import 'core/services/modal_view_service.dart';
 import 'core/services/tracks_services.dart';
 
 List<SingleChildWidget> providers = [
@@ -21,6 +22,7 @@ List<SingleChildWidget> independentServices = [
   ChangeNotifierProvider(create: (_) => MapService()),
   Provider(create: (_) => TracksService()),
   Provider(create: (_) => ParseServerRepository()),
+  Provider(create: (_) => ModalViewService()),
 ];
 
 List<SingleChildWidget> dependentServices = [

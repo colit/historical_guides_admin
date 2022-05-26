@@ -6,10 +6,12 @@ class ImageThumbnailWidget extends StatefulWidget {
     Key? key,
     required this.image,
     this.onTap,
+    this.selected = false,
   }) : super(key: key);
 
   final ImageEntity image;
   final void Function()? onTap;
+  final bool selected;
 
   @override
   State<ImageThumbnailWidget> createState() => _ImageThumbnailWidgetState();
@@ -23,19 +25,29 @@ class _ImageThumbnailWidgetState extends State<ImageThumbnailWidget>
     return Material(
       child: InkWell(
         onTap: widget.onTap?.call,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Stack(
+          alignment: Alignment.center,
           children: [
-            Expanded(
-              child: Container(
-                color: kColorSecondary,
-                // child: NetworkImageWidget(
-                //   url: widget.image.imageURL!,
-                // ),
+            Container(
+              color: kColorPrimary,
+              child: Center(
+                child: NetworkImageWidget(
+                  url: widget.image.imageURL!,
+                ),
               ),
             ),
-            UIHelper.verticalSpace(4),
-            Text(widget.image.title ?? 'NaN'),
+            if (widget.selected)
+              Container(
+                padding: const EdgeInsets.all(UIHelper.kHorizontalSpaceMedium),
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: kColorSecondaryLight,
+                ),
+                child: const Icon(
+                  Icons.check,
+                  color: kColorWhite,
+                ),
+              ),
           ],
         ),
       ),

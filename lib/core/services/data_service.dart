@@ -64,16 +64,17 @@ class DataService extends ChangeNotifier {
     required double longitude,
     required String title,
     String? description,
+    List<ImageEntity> images = const [],
   }) {
     if (_currentTour == null) return;
     final pois = _currentTour!.stations;
     final index = pois.indexWhere((e) => e.id == id);
-    print('update $id on $index');
     final station = Station(
       id: id,
       titel: title,
       position: LatLng(latitude, longitude),
       description: description,
+      images: images,
     );
     if (index < 0) {
       pois.add(station);
@@ -144,5 +145,12 @@ class DataService extends ChangeNotifier {
 
   Future<int> countImages() async {
     return _cloudDataRepository.countImages();
+  }
+
+  Future<List<ImageEntity>> getImagesAroundStation(
+      double latitude, double longitude) async {
+    return _cloudDataRepository.getImagesAroundStation(
+      LatLng(latitude, longitude),
+    );
   }
 }

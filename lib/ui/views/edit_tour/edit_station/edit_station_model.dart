@@ -28,11 +28,13 @@ class EditStationModel extends BaseModel {
   String get description => _station.description ?? '';
   bool get pointRemovable => _creatingNewPoint;
 
+  List<ImageEntity> get images => _station.images;
+
   void initModelWith(Station? station) {
     if (station != null) {
       _creatingNewPoint = false;
+      print('initModelWith(station: ${station.titel})');
       _station = station;
-      print('description: ${station.description}');
       Future.delayed(const Duration(milliseconds: 100)).then((_) {
         _dataService.hideStation(station.id);
         _mapService.showPoint(
@@ -77,8 +79,15 @@ class EditStationModel extends BaseModel {
       longitude: pointToCreate.position.longitude,
       title: _station.titel,
       description: _station.description,
+      images: _station.images,
     );
     _mapService.onLeaveEditorPage();
     _editorState.popPage();
+  }
+
+  void addImage(ImageEntity image) {
+    var images = List<ImageEntity>.from(_station.images)..add(image);
+    _station = _station.copyWith(images: images);
+    notifyListeners();
   }
 }

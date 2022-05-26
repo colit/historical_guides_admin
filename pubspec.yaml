@@ -32,6 +32,9 @@ dependencies:
     path: ../historical_guides_commons
   mapbox_gl:
     path: ../../flutter-mapbox-gl
+  # pointer_interceptor: ^0.9.3+1
+  pointer_interceptor:
+    path: ../../pub_dev/packages/packages/pointer_interceptor
 
 dependency_overrides:
   mapbox_gl_platform_interface:

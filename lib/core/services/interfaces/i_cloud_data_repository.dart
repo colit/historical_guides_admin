@@ -35,5 +35,7 @@ abstract class ICloudDataRepository {
 
   Future<void> updateImage(ImageEntity newImage, Uint8List? imageData);
 
+  Future<List<ImageEntity>> getImagesAroundStation(LatLng latLng);
+
   // Future<void> createUUIDs();
 }
