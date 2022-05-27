@@ -1,4 +1,4 @@
-import 'package:historical_guides_admin/core/models/feature_point.dart';
+import 'package:historical_guides_admin/core/models/map_feature_point.dart';
 import 'package:historical_guides_admin/core/services/map_service.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';

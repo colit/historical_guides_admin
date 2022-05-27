@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:historical_guides_admin/core/models/feature_point.dart';
+import 'package:historical_guides_admin/core/models/map_feature_point.dart';
 import 'package:historical_guides_admin/ui/widgets/text_input_widget.dart';
 import 'package:historical_guides_commons/historical_guides_commons.dart';
 import 'package:provider/provider.dart';

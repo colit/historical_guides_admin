@@ -4,18 +4,17 @@ import 'package:historical_guides_admin/core/services/modal_view_service.dart';
 import 'package:historical_guides_admin/ui/views/edit_tour/edit_station/photo_selector/image_thumbnail_widget.dart';
 import 'package:historical_guides_admin/ui/views/edit_tour/edit_station/photo_selector/photo_selector_model.dart';
 import 'package:historical_guides_commons/historical_guides_commons.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
-
-import '../../../../../core/models/feature_point.dart';
 
 class PhotoSelectorView extends StatelessWidget {
   const PhotoSelectorView({
     Key? key,
-    required this.station,
+    required this.position,
     this.onSelectImage,
   }) : super(key: key);
 
-  final MapFeaturePoint station;
+  final LatLng position;
   final void Function(ImageEntity)? onSelectImage;
 
   @override
@@ -30,8 +29,8 @@ class PhotoSelectorView extends StatelessWidget {
             dataService: context.read<DataService>(),
           ),
           onModelReady: (model) => model.initModel(
-            latitude: station.position.latitude,
-            longitude: station.position.longitude,
+            latitude: position.latitude,
+            longitude: position.longitude,
           ),
           builder: (context, model, child) {
             return model.state == ViewState.busy

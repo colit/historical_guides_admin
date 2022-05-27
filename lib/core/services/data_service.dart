@@ -153,4 +153,15 @@ class DataService extends ChangeNotifier {
       LatLng(latitude, longitude),
     );
   }
+
+  Future<void> saveStation(Station station, {bool createNew = true}) async {
+    if (createNew) {
+      final stationId = await _cloudDataRepository.createStation(station);
+      if (_currentTour != null) {
+        await _cloudDataRepository.addStationToTour(_currentTour!, stationId);
+      }
+    } else {
+      await _cloudDataRepository.updateStation(station);
+    }
+  }
 }

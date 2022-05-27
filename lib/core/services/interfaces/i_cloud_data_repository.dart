@@ -37,5 +37,11 @@ abstract class ICloudDataRepository {
 
   Future<List<ImageEntity>> getImagesAroundStation(LatLng latLng);
 
+  Future<String> createStation(Station station);
+
+  Future<void> updateStation(Station station);
+
+  Future<void> addStationToTour(Tour currentTour, String stationId);
+
   // Future<void> createUUIDs();
 }

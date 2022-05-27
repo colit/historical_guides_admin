@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:historical_guides_admin/core/models/feature_point.dart';
+import 'package:historical_guides_admin/core/models/map_feature_point.dart';
 import 'package:historical_guides_commons/historical_guides_commons.dart';
 import 'package:mapbox_gl_platform_interface/mapbox_gl_platform_interface.dart';
 

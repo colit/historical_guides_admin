@@ -391,10 +391,6 @@ class ParseServerRepository implements ICloudDataRepository {
 
   @override
   Future<void> updateImage(ImageEntity newImage, Uint8List? imageData) async {
-    print('updateImage()');
-    print(newImage.title);
-    print(newImage.objectId);
-    print(imageData?.length);
     ParseWebFile? parseFile;
     if (imageData != null) {
       // final oldFile = ParseWebFile(null, name: 'null', url: newImage.imageURL);
@@ -462,6 +458,81 @@ class ParseServerRepository implements ICloudDataRepository {
       return (output);
     } else {
       return [];
+    }
+  }
+
+  @override
+  Future<String> createStation(Station point) async {
+    List<ParseObject> images = [];
+    if (point.images.isNotEmpty) {
+      images = point.images
+          .map((e) => ParseObject('Image')..set('objectId', e.objectId))
+          .toList();
+      // final imageIds = point.images.map((e) => e.id).toList();
+      // final imagesQuery = QueryBuilder(ParseObject('Image'))
+      //   ..whereContainedIn('uuid', imageIds);
+
+      // final responce = await imagesQuery.query();
+      // if (responce.success && responce.result != null) {
+      //   images = List<ParseObject>.from(responce.result);
+      // }
+    }
+
+    final pointObject = ParseObject('PointOfInterest')
+      ..set(
+          'position',
+          ParseGeoPoint(
+            latitude: point.position.latitude,
+            longitude: point.position.longitude,
+          ))
+      ..set('title', point.titel)
+      ..set('description', point.description)
+      ..set('images', images);
+    final createResponce = await pointObject.save();
+    if (createResponce.success && createResponce.result != null) {
+      return (createResponce.result as ParseObject).get('objectId');
+    } else {
+      throw (Error);
+    }
+  }
+
+  @override
+  Future<void> updateStation(Station point) async {
+    List<ParseObject> images = point.images
+        .map((e) => ParseObject('Image')..set('objectId', e.objectId))
+        .toList();
+    print(images);
+    final pointObject = ParseObject('PointOfInterest')
+      ..objectId = point.id
+      ..set(
+          'position',
+          ParseGeoPoint(
+            latitude: point.position.latitude,
+            longitude: point.position.longitude,
+          ))
+      ..set('title', point.titel)
+      ..set('images', images)
+      ..set('description', point.description);
+    final updateResponce = await pointObject.save();
+    if (!updateResponce.success) {
+      throw (Error);
+    }
+  }
+
+  @override
+  Future<void> addStationToTour(Tour currentTour, String stationId) async {
+    final tourRequest = await ParseObject('Track').getObject(currentTour.id);
+    if (tourRequest.success) {
+      final tour = tourRequest.result as ParseObject;
+      final stations = List<ParseObject>.from(tour.get('stations'));
+      final newStation = ParseObject('PointOfInterest')
+        ..set('objectId', stationId);
+      stations.add(newStation);
+      tour.set('stations', stations);
+      final responce = await tour.save();
+      if (responce.success) {
+        print(responce.result);
+      }
     }
   }
 }
