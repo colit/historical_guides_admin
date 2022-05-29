@@ -365,7 +365,7 @@ packages:
       path: "../historical_guides_commons"
       relative: true
     source: path
-    version: "0.0.1"
+    version: "0.0.2"
   hive:
     dependency: transitive
     description:

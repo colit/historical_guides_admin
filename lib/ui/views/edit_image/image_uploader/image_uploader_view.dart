@@ -13,7 +13,7 @@ class ImageUploaderView extends StatefulWidget {
   }) : super(key: key);
 
   final String? url;
-  final void Function(Uint8List data) onImageUpdate;
+  final void Function(Uint8List data, String name) onImageUpdate;
 
   @override
   State<ImageUploaderView> createState() => _ImageUploaderViewState();
@@ -24,18 +24,18 @@ class _ImageUploaderViewState extends State<ImageUploaderView> {
   late final networkImage =
       widget.url == null ? Container() : NetworkImageWidget(url: widget.url!);
 
-  void _processImage(Uint8List? data) {
-    if (data == null) {
+  void _processImage(FilePickerResponce? responce) {
+    if (responce == null) {
       print('remove image');
       setState(() {
         image = null;
       });
       return;
     }
-    final imageTemp = img.decodeJpg(data);
-    final resizedImage = img.copyResize(imageTemp!, width: 800);
+    final imageTemp = img.decodeJpg(responce.data);
+    final resizedImage = img.copyResize(imageTemp!, width: 1200);
     final imageData = Uint8List.fromList(img.encodeJpg(resizedImage));
-    widget.onImageUpdate.call(imageData);
+    widget.onImageUpdate.call(imageData, responce.name);
     setState(() {
       image = Image.memory(imageData);
     });

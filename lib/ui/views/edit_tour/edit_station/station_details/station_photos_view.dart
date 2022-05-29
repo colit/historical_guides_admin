@@ -3,7 +3,6 @@ import 'package:historical_guides_commons/historical_guides_commons.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../../core/services/modal_view_service.dart';
 import '../photo_selector/image_thumbnail_widget.dart';
 import '../photo_selector/photo_selector_view.dart';
 

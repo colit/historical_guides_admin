@@ -4,13 +4,13 @@ import 'package:historical_guides_commons/historical_guides_commons.dart';
 class TextInputWidget extends StatefulWidget {
   const TextInputWidget({
     Key? key,
-    this.value = '',
+    this.value,
     this.onChange,
     this.maxLines = 1,
     this.labelText,
   }) : super(key: key);
 
-  final String value;
+  final String? value;
   final void Function(String)? onChange;
   final int maxLines;
   final String? labelText;

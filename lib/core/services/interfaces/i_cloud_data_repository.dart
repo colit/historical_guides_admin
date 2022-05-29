@@ -31,9 +31,8 @@ abstract class ICloudDataRepository {
 
   Future<void> deleteImage(ImageEntity newImage);
 
-  Future<String> uploadImage(Uint8List imageData);
-
-  Future<void> updateImage(ImageEntity newImage, Uint8List? imageData);
+  Future<void> updateImage(
+      ImageEntity newImage, Uint8List? imageData, String? imageName);
 
   Future<List<ImageEntity>> getImagesAroundStation(LatLng latLng);
 

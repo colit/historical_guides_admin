@@ -38,52 +38,95 @@ class EditImageView extends StatelessWidget {
                     padding: const EdgeInsets.all(
                       UIHelper.kHorizontalSpaceSmall,
                     ),
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Consumer<MapFeaturePoint?>(
-                            builder: ((context, value, child) {
-                              if (value == null) return Container();
-                              final latitude =
-                                  value.position.latitude.toStringAsFixed(4);
-                              final longitude =
-                                  value.position.longitude.toStringAsFixed(4);
-                              return Padding(
+                    child: Consumer<MapFeaturePoint?>(
+                      builder: ((context, point, child) {
+                        final latitude =
+                            point?.position.latitude.toStringAsFixed(4);
+                        final longitude =
+                            point?.position.longitude.toStringAsFixed(4);
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            if (point != null)
+                              Padding(
                                 padding: const EdgeInsets.all(
                                     UIHelper.kHorizontalSpaceSmall),
                                 child: Text('Position: $latitude, $longitude'),
-                              );
-                            }),
-                          ),
-                          TextInputWidget(
-                            labelText: 'Name',
-                            value: model.image.title ?? model.title,
-                            onChange: model.updateName,
-                          ),
-                          TextInputWidget(
-                            labelText: 'Beschreibung',
-                            value: model.image.description ?? model.description,
-                            onChange: model.updateDescription,
-                          ),
-                          ImageUploaderView(
-                            url: model.image.imageURL,
-                            onImageUpdate: (data) => model.updateImage(data),
-                          ),
-                          ElevatedButton(
-                            onPressed: model.uploadData,
-                            child: const Text('Foto hochladen'),
-                            style: Theme.of(context).elevatedButtonTheme.style,
-                          ),
-                          if (!model.newImage) ...[
-                            UIHelper.verticalSpaceSmall(),
+                              ),
+                            TextInputWidget(
+                              labelText: 'Name',
+                              value: model.title,
+                              onChange: model.updateName,
+                            ),
+                            TextInputWidget(
+                              labelText: 'Beschreibung',
+                              value: model.description,
+                              onChange: model.updateDescription,
+                            ),
+                            ImageUploaderView(
+                              url: model.image.imageURL,
+                              onImageUpdate: (data, name) =>
+                                  model.updateImage(data, name),
+                            ),
+                            TextInputWidget(
+                              labelText: 'Veröffentlicht',
+                              value: model.published.toString(),
+                              onChange: (year) =>
+                                  model.updatePublished(int.parse(year)),
+                            ),
+                            TextInputWidget(
+                              labelText: 'Lizenz',
+                              value: model.license,
+                              onChange: model.updateLicense,
+                            ),
+                            TextInputWidget(
+                              labelText: 'Lizenz URL',
+                              value: model.licenseURL,
+                              onChange: model.updateLizenzURL,
+                            ),
+                            TextInputWidget(
+                              labelText: 'Autor',
+                              value: model.author,
+                              onChange: model.updateAutor,
+                            ),
+                            TextInputWidget(
+                              labelText: 'Autor URL',
+                              value: model.authorURL,
+                              onChange: model.updateAutorURL,
+                            ),
+                            TextInputWidget(
+                              labelText: 'Quelle',
+                              value: model.source,
+                              onChange: model.updateSource,
+                            ),
+                            TextInputWidget(
+                              labelText: 'Quelle URL',
+                              value: model.sourceURL,
+                              onChange: model.updateSourceURL,
+                            ),
                             ElevatedButton(
-                              onPressed: model.deleteImage,
-                              child: const Text('Foto löschen'),
+                              onPressed: model.checkUpdate(point)
+                                  ? model.uploadData
+                                  : null,
+                              child: Text(model.newImage
+                                  ? 'Foto hochladen'
+                                  : 'Foto aktualisieren'),
                               style:
                                   Theme.of(context).elevatedButtonTheme.style,
-                            )
-                          ]
-                        ]),
+                            ),
+                            if (!model.newImage) ...[
+                              UIHelper.verticalSpaceSmall(),
+                              ElevatedButton(
+                                onPressed: model.deleteImage,
+                                child: const Text('Foto löschen'),
+                                style:
+                                    Theme.of(context).elevatedButtonTheme.style,
+                              )
+                            ]
+                          ],
+                        );
+                      }),
+                    ),
                   ),
           );
         });

@@ -133,8 +133,9 @@ class DataService extends ChangeNotifier {
     ImageEntity newImage, {
     Uint8List? imageData,
     bool create = false,
+    String? imageName,
   }) async {
-    await _cloudDataRepository.updateImage(newImage, imageData);
+    await _cloudDataRepository.updateImage(newImage, imageData, imageName);
     notifyListeners();
   }
 

@@ -1,5 +1,6 @@
 import 'package:historical_guides_admin/core/models/map_feature_point.dart';
 import 'package:historical_guides_admin/core/services/map_service.dart';
+import 'package:historical_guides_commons/historical_guides_commons.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 
@@ -7,7 +8,6 @@ import 'core/app_state.dart';
 import 'core/editor_state.dart';
 import 'core/repositories/parse_server_repository.dart';
 import 'core/services/data_service.dart';
-import 'core/services/modal_view_service.dart';
 import 'core/services/tracks_services.dart';
 
 List<SingleChildWidget> providers = [

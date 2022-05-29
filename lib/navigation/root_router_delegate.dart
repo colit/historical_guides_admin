@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:historical_guides_admin/core/services/modal_view_service.dart';
+import 'package:historical_guides_commons/historical_guides_commons.dart';
 import 'package:provider/provider.dart';
 
 import '../core/app_state.dart';
-import '../ui/managers/modal_view_manager.dart';
 import '../ui/views/app_shell.dart';
 import 'app_routes.dart';
 
@@ -39,8 +38,8 @@ class RootRouterDelegate extends RouterDelegate<AppRoutePath>
       key: navigatorKey,
       pages: [
         MaterialPage(
-          child: GalleryManager(
-            galleryService: context.read<ModalViewService>(),
+          child: ModalViewManager(
+            modalViewService: context.read<ModalViewService>(),
             child: const AppShell(),
           ),
         )

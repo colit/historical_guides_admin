@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:historical_guides_admin/ui/widgets/round_icon_button.dart';
 import 'package:historical_guides_commons/historical_guides_commons.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
-
-import '../../core/services/modal_view_service.dart';
 
 class GalleryManager extends StatefulWidget {
   const GalleryManager({
@@ -51,7 +48,8 @@ class _GalleryManagerState extends State<GalleryManager> {
     setState(() {
       visible = false;
     });
-    Navigator.of(context).pop();
+    Navigator.pop(context);
+    // Navigator.of(context).pop();
   }
 
   void _showGallery(content) {
@@ -75,9 +73,7 @@ class _GalleryManagerState extends State<GalleryManager> {
                 padding: const EdgeInsets.all(UIHelper.kHorizontalSpaceSmall),
                 child: RoundIconButton(
                   icon: const Icon(Icons.close),
-                  onTap: () {
-                    _closeGallery();
-                  },
+                  onTap: _closeGallery,
                 ),
               ),
             ),

@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:historical_guides_admin/core/editor_state.dart';
+import 'package:historical_guides_admin/core/models/map_feature_point.dart';
 import 'package:historical_guides_commons/historical_guides_commons.dart';
 
 import '../../../core/services/data_service.dart';
@@ -24,12 +25,22 @@ class EditImageModel extends BaseModel {
 
   bool _newImage = false;
   bool _dataUpdated = false;
-  String _title = 'New Name';
-  String _description = 'Description';
-  Uint8List? _imageData;
 
-  String get title => _title;
-  String get description => _description;
+  bool get dataUpdated => _dataUpdated;
+
+  Uint8List? _imageData;
+  String? _imageName;
+
+  String? get title => _image.title;
+  String? get description => _image.description;
+  String? get author => _image.author;
+  String? get authorURL => _image.authorURL;
+  String? get license => _image.license;
+  String? get licenseURL => _image.licenseURL;
+  String? get source => _image.source;
+  String? get sourceURL => _image.sourceURL;
+  int? get published => _image.yearPublished;
+
   bool get newImage => _newImage;
 
   void initModel(int id) {
@@ -55,19 +66,20 @@ class EditImageModel extends BaseModel {
     }
   }
 
-  void updateImage(Uint8List data) {
+  void updateImage(Uint8List data, String name) {
     _imageData = data;
+    _imageName = name;
     _dataUpdated = true;
   }
 
   void updateName(String value) {
-    _title = value;
-    _dataUpdated = true;
+    _image = _image.copyWith(title: value);
+    _registerUpdate();
   }
 
   void updateDescription(String value) {
-    _description = value;
-    _dataUpdated = true;
+    _image = _image.copyWith(description: value);
+    _registerUpdate();
   }
 
   void uploadData() {
@@ -75,13 +87,11 @@ class EditImageModel extends BaseModel {
     _dataService
         .updateImage(
       _image.copyWith(
-        id: _image.id,
         latitude: _mapService.pointToCreate!.position.latitude,
         longitude: _mapService.pointToCreate!.position.longitude,
-        title: _title,
-        description: _description,
       ),
       imageData: _imageData,
+      imageName: _imageName,
       create: _newImage,
     )
         .then((_) {
@@ -96,5 +106,51 @@ class EditImageModel extends BaseModel {
       _mapService.removePoint();
       _editorState.popPage();
     });
+  }
+
+  void updateLicense(String value) {
+    _image = _image.copyWith(license: value);
+    _registerUpdate();
+  }
+
+  void updateLizenzURL(String value) {
+    _image = _image.copyWith(licenseURL: value);
+    _registerUpdate();
+  }
+
+  void updateAutor(String value) {
+    _image = _image.copyWith(author: value);
+    _registerUpdate();
+  }
+
+  void updateAutorURL(String value) {
+    _image = _image.copyWith(authorURL: value);
+    _registerUpdate();
+  }
+
+  void updateSource(String value) {
+    _image = _image.copyWith(source: value);
+    _registerUpdate();
+  }
+
+  void updateSourceURL(String value) {
+    _image = _image.copyWith(sourceURL: value);
+    _registerUpdate();
+  }
+
+  void updatePublished(int value) {
+    _image = _image.copyWith(yearPublished: value);
+    _registerUpdate();
+  }
+
+  void _registerUpdate() {
+    _dataUpdated = true;
+    notifyListeners();
+  }
+
+  bool checkUpdate(MapFeaturePoint? point) {
+    return _image.latitude != point?.position.latitude ||
+        _image.longitude != point?.position.longitude ||
+        _dataUpdated;
   }
 }

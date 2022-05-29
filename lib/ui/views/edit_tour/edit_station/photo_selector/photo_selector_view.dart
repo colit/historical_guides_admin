@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:historical_guides_admin/core/services/data_service.dart';
-import 'package:historical_guides_admin/core/services/modal_view_service.dart';
 import 'package:historical_guides_admin/ui/views/edit_tour/edit_station/photo_selector/image_thumbnail_widget.dart';
 import 'package:historical_guides_admin/ui/views/edit_tour/edit_station/photo_selector/photo_selector_model.dart';
 import 'package:historical_guides_commons/historical_guides_commons.dart';

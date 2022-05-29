@@ -11,7 +11,7 @@ class FilePickerView extends StatefulWidget {
     this.extensions = const [],
   }) : super(key: key);
 
-  final void Function(Uint8List?) onData;
+  final void Function(FilePickerResponce?) onData;
   final List<String> extensions;
 
   @override
@@ -54,9 +54,10 @@ class _FilePickerViewState extends State<FilePickerView> {
     }
     if (!mounted) return;
     if (_file != null) {
+      final name = _file!.name;
       final bytes = _file!.bytes;
       if (bytes != null) {
-        widget.onData.call(bytes);
+        widget.onData.call(FilePickerResponce(data: bytes, name: name));
       }
     }
     setState(() {
@@ -98,4 +99,14 @@ class _FilePickerViewState extends State<FilePickerView> {
             ),
     );
   }
+}
+
+class FilePickerResponce {
+  FilePickerResponce({
+    required this.data,
+    required this.name,
+  });
+
+  final Uint8List data;
+  final String name;
 }

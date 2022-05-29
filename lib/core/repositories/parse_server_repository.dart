@@ -380,23 +380,11 @@ class ParseServerRepository implements ICloudDataRepository {
   }
 
   @override
-  Future<String> uploadImage(Uint8List imageData) async {
-    final parseFile = ParseWebFile(
-      imageData,
-      name: 'image.jpg',
-    );
-    await parseFile.save();
-    return 'url';
-  }
-
-  @override
-  Future<void> updateImage(ImageEntity newImage, Uint8List? imageData) async {
+  Future<void> updateImage(
+      ImageEntity newImage, Uint8List? imageData, String? imageName) async {
     ParseWebFile? parseFile;
-    if (imageData != null) {
-      // final oldFile = ParseWebFile(null, name: 'null', url: newImage.imageURL);
-      // await oldFile.delete();
-      parseFile =
-          ParseWebFile(imageData, name: '${newImage.title ?? 'image'}.jpg');
+    if (imageData != null && imageName != null) {
+      parseFile = ParseWebFile(imageData, name: imageName);
       final responce = await parseFile.save();
       print('file saved with ${responce.result}');
     }
